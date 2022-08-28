@@ -1,70 +1,56 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebApplication1.Models;
+using WebApplication1.Services;
 
 namespace WebApplication1.Controllers
 {
-    [Route("[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class teacherController : Controller
     {
-        public static List<teacher> teachers = new List<teacher>
+            public ITeacherInt _teacherService;
+
+            public teacherController(ITeacherInt teacherService)
             {
-                new teacher
-                {
-                    Id = 1,
-                    FirstName = "Alaa",
-                    LastName = "Sawadeh",
-                    City = "Ram-Allah"
-                },new teacher
-                {
-                    Id = 2,
-                    FirstName = "Omar",
-                    LastName = "Nour",
-                    City = "Tulkarem"
-                }
-            };
-        [HttpGet]
-        public async Task<ActionResult<List<teacher>>> Get()
-        {
-            return Ok(teachers);
+                _teacherService = teacherService;
+
+            }
+            [HttpGet("GetTeacher")]
+            public async Task<ActionResult<List<teacher>>> Get()
+            {
+                return Ok(_teacherService.GetTeacher());
+            }
+
+            [HttpGet("GetById/{id}")]
+        public async Task<ActionResult<teacher>>GetById(int id)
+            {
+
+                return Ok(_teacherService.GetById(id));
+            }
+
+            [HttpPost("NewTeacher")]
+
+            public async Task<ActionResult<List<teacher>>> CreateTeacher(teacher newTeacher)
+            {
+
+                return Ok(_teacherService.CreateTeacher(newTeacher));
+            }
+
+            [HttpPut("Update")]
+            public async Task<ActionResult<List<teacher>>> UpdateTeacher(teacher updateTeacher)
+            {
+
+                return Ok(_teacherService.UpdateTeacher(updateTeacher));
+            }
+
+            [HttpDelete("Delete/{id}")]
+            public async Task<ActionResult<List<teacher>>> DeleteTeacher(int id)
+            {
+
+                return Ok(_teacherService.DeleteTeacher(id));
+            }
 
         }
-        [HttpPost]
-        public async Task<ActionResult<List<teacher>>> AddTeacher(teacher tP)
-        {
-            teachers.Add(tP);
-            return Ok(teachers);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<teacher>> Get(int id)
-        {
-            var tG = teachers.Find(x => x.Id == id);
-            if (tG == null)
-                return BadRequest("Teacher Not Found.");
-            return Ok(tG);
-        }
-        [HttpPut]
-        public async Task<ActionResult<List<teacher>>> UpdateTeacher(teacher request)
-        {
-            var tG = teachers.Find(x => x.Id == request.Id);
-            if (tG == null)
-                return BadRequest("Teacher Not Found.");
-            tG.FirstName = request.FirstName;
-            tG.LastName = request.LastName;
-            tG.City = request.City;
-            return Ok(teachers);
-        }
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<List<teacher>>> Delete(int id)
-        {
-            var tG = teachers.Find(x => x.Id == id);
-            if (tG == null)
-                return BadRequest("Teacher Not Found.");
-
-            teachers.Remove(tG);
-            return Ok(teachers);
-        }
-
     }
-}
